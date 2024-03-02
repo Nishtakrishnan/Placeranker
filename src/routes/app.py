@@ -10,7 +10,7 @@ def get_location_data (query):
     data = response.json()
     return data
 
-# # TO DO
+# # TO DO once SQL server is set up
 # # Location ID is the location ranking in our SQL database
 # def update_rank (location_id):
 
