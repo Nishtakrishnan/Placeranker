@@ -1,35 +1,22 @@
 import React from 'react';
 import "./App.css";
+import "./styles/MainPage.css"
 import Login from "./components/Login";
+import MainPage from "./components/MainPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
+  const loggedIn = true; // Set to true if the user is logged in, false otherwise
   return (
-    <div className="App">
-      <MainPageContent />
-    </div>
-  );
-  return <div className="App">
     <BrowserRouter>
-        <Routes>
+      <Routes>
+        {loggedIn ? (
+          <Route path="/" element={<MainPage/>} />
+        ) : (
           <Route path="/" element={<Login />} />
-          
-        </Routes>
-      </BrowserRouter>
-  </div>;
+        )}
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-class MainPageContent extends React.Component {
-  render() {
-    return (
-      <div className="Main-page">
-        <h1>Placeranker</h1>
-        <div className="Search-bar">
-          <input type="text" placeholder="Type your city here" />
-        </div>
-      </div>
-    );
-  }
-}
-
 export default App;

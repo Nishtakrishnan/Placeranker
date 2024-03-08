@@ -72,7 +72,7 @@ import {
           p={7}
         >
           <div className="place">
-            <Typography variant="h2">PlaceMaker</Typography>
+            <Typography variant="h2">PlaceRanker</Typography>
           </div>
           <Typography variant="h6">Don't have an account?</Typography>
           <Link href="/register">{"Register here."}</Link>
