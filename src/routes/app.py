@@ -28,7 +28,7 @@ def connect_to_database():
         print("Error connecting to Placeranker database:", e)
         return None
 
-@app.route('/login/<username>', methods = ['POST'])
+@app.route('/create/<username>/', methods = ['POST'])
 def create_user (username):
     conn = connect_to_database()
 
@@ -36,7 +36,15 @@ def create_user (username):
     if request.is_json:
         body = request.json
         password = body["password"]
-        
+        conn = connect_to_database()
+        sql_query = f"INSERT INTO \"Login\" (username, password) values {(username, password)};"
+        cursor = conn.cursor()
+        cursor.execute(sql_query)
+        conn.commit()
+        return {}, 200
+    else:
+        return {}, 400
+
 
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
