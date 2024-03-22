@@ -78,7 +78,7 @@ def update_rank (username):
         longitude = place_data['position']['lng']
         return {}, 200   
     else:
-        return {}
+        return {}, 400
 
 if __name__ == "__main__":
     # print(get_location_data("Mia Za's Champaign"))
