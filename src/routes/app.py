@@ -45,7 +45,6 @@ def create_user (username):
     else:
         return {}, 400
 
-
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
     conn = connect_to_database()
@@ -67,11 +66,20 @@ def get_location_data (query):
     data = response.json()
     return data
 
-# # TO DO once SQL server is set up
-# # Location ID is the location ranking in our SQL database
-# def update_rank (location_id):
 
+@app.route("/addlocation/<username>", methods = ['POST'])
+def update_rank (username):
+    if request.is_json:
+        place_data = request.json.get("placeInfo").get("items")[0]
+        location_id = place_data['id']
+        location_name = place_data['title']
+        print(f"Location ID: {location_id}. Location name: {location_name}.")
+        latitude = place_data['position']['lat']
+        longitude = place_data['position']['lng']
+        return {}, 200   
+    else:
+        return {}
 
 if __name__ == "__main__":
-    # get_location_data("Mia Za's Champaign")
+    # print(get_location_data("Mia Za's Champaign"))
     app.run(debug = True)
