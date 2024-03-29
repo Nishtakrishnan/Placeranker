@@ -70,6 +70,22 @@ def get_friends (username):
     rows = cursor.fetchall()[0]["friends_list"]
     return {"friends" : rows}, 200
 
+@app.route("/requests/<username>", methods = ['GET'])
+def get_friend_requests (username):
+    conn = connect_to_database()
+    sql_query = f"SELECT requests FROM \"Friends\" WHERE username = '{username}';"
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+
+    rows = cursor.fetchall()[0]["requests"]
+    return {"requests" : rows}, 200
+
+# # Send friend request from from_user to to_user
+# @app.route("/friends/<from_user>/<to_user>", methods = ['POST'])
+# def send_friend_request (from_user, to_user):
+#      conn = connect_to_database()
+
+
 def get_location_data (query):
     url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={api_key}"
     response = requests.get(url)
