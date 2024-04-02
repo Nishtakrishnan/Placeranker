@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 const Login = (props) => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { setLoggedIn } = props;
   const [failedLogin, setFailedLogin] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
