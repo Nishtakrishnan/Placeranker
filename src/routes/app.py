@@ -45,7 +45,6 @@ def create_user (username):
     else:
         return {}, 400
 
-
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
     conn = connect_to_database()
@@ -60,6 +59,32 @@ def authenticate_user (username, password):
         return {}, 401
     else:
         return {}, 200
+    
+@app.route("/friends/<username>", methods = ['GET'])
+def get_friends (username):
+    conn = connect_to_database()
+    sql_query = f"SELECT friends_list FROM \"Friends\" WHERE username = '{username}';"
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+
+    rows = cursor.fetchall()[0]["friends_list"]
+    return {"friends" : rows}, 200
+
+@app.route("/requests/<username>", methods = ['GET'])
+def get_friend_requests (username):
+    conn = connect_to_database()
+    sql_query = f"SELECT requests FROM \"Friends\" WHERE username = '{username}';"
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+
+    rows = cursor.fetchall()[0]["requests"]
+    return {"requests" : rows}, 200
+
+# # Send friend request from from_user to to_user
+# @app.route("/friends/<from_user>/<to_user>", methods = ['POST'])
+# def send_friend_request (from_user, to_user):
+#      conn = connect_to_database()
+
 
 def get_location_data (query):
     url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={api_key}"
@@ -67,11 +92,20 @@ def get_location_data (query):
     data = response.json()
     return data
 
-# # TO DO once SQL server is set up
-# # Location ID is the location ranking in our SQL database
-# def update_rank (location_id):
 
+@app.route("/addlocation/<username>", methods = ['POST'])
+def update_rank (username):
+    if request.is_json:
+        place_data = request.json.get("placeInfo").get("items")[0]
+        location_id = place_data['id']
+        location_name = place_data['title']
+        print(f"Location ID: {location_id}. Location name: {location_name}.")
+        latitude = place_data['position']['lat']
+        longitude = place_data['position']['lng']
+        return {}, 200   
+    else:
+        return {}, 400
 
 if __name__ == "__main__":
-    # get_location_data("Mia Za's Champaign")
+    # print(get_location_data("Mia Za's Champaign"))
     app.run(debug = True)
