@@ -1,5 +1,6 @@
-import React from 'react';
-import '../styles/MainPage.css'; 
+import React from "react";
+import "../styles/MainPage.css";
+import JsonUploader from "./JsonUploader";
 
 class MainPage extends React.Component {
   render() {
@@ -9,6 +10,7 @@ class MainPage extends React.Component {
         <div className="Search-bar">
           <input type="text" placeholder="Type your city here" />
         </div>
+        <JsonUploader />
       </div>
     );
   }
