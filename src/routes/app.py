@@ -9,10 +9,10 @@ app = Flask("Placeranker")
 api_key = "WIyTOweLaqKkQrUl4HmxokjOSf-W2zhXmfUm2Sxd7zc"
 
 # Database connection parameters
-DB_HOST = 'localhost'
-DB_NAME = 'Placeranker'
+DB_HOST = '192.168.0.87'
+DB_NAME = 'placeranker'
 DB_USER = 'postgres'
-DB_PASSWORD = 'admin123'
+DB_PASSWORD = '1469'
 
 def connect_to_database():
     try:
