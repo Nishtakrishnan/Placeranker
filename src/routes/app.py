@@ -70,6 +70,32 @@ def get_friends (username):
     rows = cursor.fetchall()[0]["friends_list"]
     return {"friends" : rows}, 200
 
+# From user is the user who accepted the friend request from to_user
+@app.route("/friends/<from_user>/<to_user>", methods = ["PUT"])
+def add_friends (from_user, to_user):
+    conn = connect_to_database()
+    # Get the to_user's friend requests
+    friend_requests, status = get_friend_requests(from_user)
+    friend_requests = friend_requests['requests']
+    friends_list, status = get_friends(from_user)
+    friends_list = friends_list["friends"]
+    # Can't add as friend, no pending request sent or already friends
+    if to_user not in friend_requests or to_user in friends_list:
+        return {}, 404
+    
+    # Add each other as friends
+    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{from_user}')
+                    WHERE username = '{to_user}';"""
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{to_user}')
+                    WHERE username = '{from_user}';"""
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    conn.commit()
+    return {}, 200
+
 @app.route("/requests/<username>", methods = ['GET'])
 def get_friend_requests (username):
     conn = connect_to_database()
@@ -80,21 +106,21 @@ def get_friend_requests (username):
     rows = cursor.fetchall()[0]["requests"]
     return {"requests" : rows}, 200
 
-@app.route("/request/<username>", methods = ['PUT'])
-def send_friend_request (username):
+# Sendss a friend request from 'from_user' to 'to_user'
+@app.route("/requests/<from_user>/<to_user>", methods = ['PUT'])
+def send_friend_request (from_user, to_user):
     conn = connect_to_database()
-    sql_query = f""
+    friend_requests, status = get_friend_requests(to_user)
+    friend_requests = friend_requests['requests']
+    # A pending request already exists from 'from_user' to 'to_user'
+    if from_user in friend_requests:
+        return {}, 404
+    sql_query = f"""UPDATE \"Friends\" SET requests = array_append(requests, '{from_user}')
+                    WHERE username = '{to_user}';"""
     cursor = conn.cursor()
     cursor.execute(sql_query)
-
-    rows = cursor.fetchall()[0]["requests"]
+    conn.commit()
     return {}, 200
-
-# # Send friend request from from_user to to_user
-# @app.route("/friends/<from_user>/<to_user>", methods = ['POST'])
-# def send_friend_request (from_user, to_user):
-#      conn = connect_to_database()
-
 
 def get_location_data (query):
     url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={api_key}"
