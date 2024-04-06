@@ -80,6 +80,16 @@ def get_friend_requests (username):
     rows = cursor.fetchall()[0]["requests"]
     return {"requests" : rows}, 200
 
+@app.route("/request/<username>", methods = ['PUT'])
+def send_friend_request (username):
+    conn = connect_to_database()
+    sql_query = f""
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+
+    rows = cursor.fetchall()[0]["requests"]
+    return {}, 200
+
 # # Send friend request from from_user to to_user
 # @app.route("/friends/<from_user>/<to_user>", methods = ['POST'])
 # def send_friend_request (from_user, to_user):
