@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests
-
+import pandas as pd
 app = Flask("Placeranker")
+CORS(app)
 
 # API Key for HERE API
 api_key = "WIyTOweLaqKkQrUl4HmxokjOSf-W2zhXmfUm2Sxd7zc"
@@ -36,7 +38,13 @@ def create_user (username):
     if request.is_json:
         body = request.json
         password = body["password"]
+        print(password)
         conn = connect_to_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM \"Login\" WHERE username='{}';".format(username))
+        frame = pd.DataFrame(cursor.fetchall())
+        if (not frame.empty):
+            return {"successful" : False}, 401
         sql_query = f"INSERT INTO \"Login\" (username, password) values {(username, password)};"
         cursor = conn.cursor()
         cursor.execute(sql_query)
@@ -44,6 +52,7 @@ def create_user (username):
         return {}, 200
     else:
         return {}, 400
+    
 
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
