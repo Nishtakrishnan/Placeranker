@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests
 import hashlib
+import uuid
 
 app = Flask("Placeranker")
 
@@ -145,14 +146,16 @@ def update_rank (username):
 
             
             sql_query = f"""INSERT INTO \"Places\" (longitude, latitude, location_id, google_maps_url, location_name, address)
-                            values {(longitude, latitude, location_id, google_maps_url, location_name, address)};"""
+                            values {(longitude, latitude, location_id, google_maps_url, location_name, address)}
+                            ON CONFLICT (location_id) DO NOTHING;"""
             cursor = conn.cursor()
             cursor.execute(sql_query)
             conn.commit()
 
             # Also create an entry in the ratings table
-            sql_query = f"""INSERT INTO \"Ratings\" (username, location_id, rating, comment)
-                            values {(username, location_id, "", "")};""" # For now, JSON doesn't contain ratings/comments so leave them blank
+            rating_id = str(uuid.uuid4())
+            sql_query = f"""INSERT INTO \"Ratings\" (rating_id, username, location_id)
+                            values {(rating_id, username, location_id)};""" # For now, JSON doesn't contain ratings/comments so leave them blank
             cursor = conn.cursor()
             cursor.execute(sql_query)
             conn.commit()
