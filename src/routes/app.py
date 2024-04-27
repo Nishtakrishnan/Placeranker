@@ -1,9 +1,16 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests
 
+import pandas as pd
+import hashlib
+import uuid
+
+
 app = Flask("Placeranker")
+CORS(app)
 
 # API Key for HERE API
 api_key = "WIyTOweLaqKkQrUl4HmxokjOSf-W2zhXmfUm2Sxd7zc"
@@ -36,7 +43,13 @@ def create_user (username):
     if request.is_json:
         body = request.json
         password = body["password"]
+        print(password)
         conn = connect_to_database()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM \"Login\" WHERE username='{}';".format(username))
+        frame = pd.DataFrame(cursor.fetchall())
+        if (not frame.empty):
+            return {"successful" : False}, 401
         sql_query = f"INSERT INTO \"Login\" (username, password) values {(username, password)};"
         cursor = conn.cursor()
         cursor.execute(sql_query)
@@ -44,6 +57,7 @@ def create_user (username):
         return {}, 200
     else:
         return {}, 400
+    
 
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
@@ -124,7 +138,7 @@ def send_friend_request (from_user, to_user):
 
 def get_location_data (query):
     url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={api_key}"
-    response = requests.get(url)
+    response = requests.get(url)    
     data = response.json()
     return data
 
@@ -132,13 +146,31 @@ def get_location_data (query):
 @app.route("/addlocation/<username>", methods = ['POST'])
 def update_rank (username):
     if request.is_json:
-        place_data = request.json.get("placeInfo").get("items")[0]
-        location_id = place_data['id']
-        location_name = place_data['title']
-        print(f"Location ID: {location_id}. Location name: {location_name}.")
-        latitude = place_data['position']['lat']
-        longitude = place_data['position']['lng']
-        return {}, 200   
+        conn = connect_to_database()
+        location_data = request.json.get("features")
+        for location_obj in location_data:
+            latitude, longitude = location_obj.get("geometry").get("coordinates")
+            location_properties = location_obj.get("properties")
+            google_maps_url = location_properties.get("google_maps_url")
+            address, location_name = location_properties["location"]["address"], location_properties["location"]["name"]
+            # Location_id is the hash of the address (since this will be unique anyway)
+            location_id = hashlib.sha256(address.encode()).hexdigest()
+
+            
+            sql_query = f"""INSERT INTO \"Places\" (longitude, latitude, location_id, google_maps_url, location_name, address)
+                            values {(longitude, latitude, location_id, google_maps_url, location_name, address)}
+                            ON CONFLICT (location_id) DO NOTHING;"""
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            conn.commit()
+
+            # Also create an entry in the ratings table
+            rating_id = str(uuid.uuid4())
+            sql_query = f"""INSERT INTO \"Ratings\" (rating_id, username, location_id)
+                            values {(rating_id, username, location_id)};""" # For now, JSON doesn't contain ratings/comments so leave them blank
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            conn.commit()
     else:
         return {}, 400
 
