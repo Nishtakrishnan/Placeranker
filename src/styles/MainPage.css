@@ -1,0 +1,33 @@
+body {
+  background-color: black;
+  color: white;
+  align-items: center;
+  font-family: "Trebuchet MS, Helvetica";
+}
+
+.App {
+  text-align: center;
+}
+
+/* Styling for header (placeranker) */
+.Main-page h1 {
+  font-size: 96px;
+  text-align: left;
+  padding-left: 100px;
+  padding-top: 200px;
+  color: #e7cc6b;
+}
+
+/* Styling for search bar */
+.Main-page .Search-bar {
+  text-align: right;
+  padding-right: 100px;
+  margin-top: -150px;
+}
+
+.Main-page .Search-bar input {
+  font-family: "Trebuchet MS, Helvetica";
+  padding: 15px;
+  font-size: 32px;
+  width: 400px;
+}

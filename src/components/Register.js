@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Stack, TextField, Button, Box, Alert } from "@mui/material";
-import { Select, FormControl, InputLabel, MenuItem, OutlinedInput, Chip } from "@mui/material";
+import {
+  Typography,
+  Stack,
+  TextField,
+  Button,
+  Box,
+  Alert,
+} from "@mui/material";
+import {
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Chip,
+} from "@mui/material";
 import Login from "./Login";
 
 const Register = (props) => {
@@ -65,21 +79,23 @@ const Register = (props) => {
     console.log(data);
     // Update database
     try {
-        
-      const response = await fetch(`http://127.0.0.1:5000/create/${username}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      console.log(data)
+      const response = await fetch(
+        `http://127.0.0.1:5000/create/${username}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      console.log(data);
       if (response.status == 200) {
         const data = await response.json();
         if (data.successful) {
           window.localStorage.setItem("token", username);
           setLoggedIn(true);
-          window.location.assign('/home'); //new
+          window.location.assign("/home"); //new
         }
       } else {
         setFailedRegistration(true);
@@ -92,20 +108,21 @@ const Register = (props) => {
   return loggedIn ? (
     <Login />
   ) : (
-    <div className="centered">
+    <div className="centered w-[30%]">
       <Stack
-        color="#E84A27"
+        color="#29261B"
         spacing={3}
         sx={{
-          borderRadius: 3,
-          boxShadow: 5,
           alignItems: "center",
-          backgroundColor: "#EDE9E8",
+          backgroundColor: "#F6EFE4",
         }}
         p={6}
       >
-        <div className="register-meet">
-          <Typography variant="h3">Register - PlaceRanker</Typography>
+        <div className="register-meet text-4xl text-center">
+          <h1>Placeranker</h1>
+        </div>
+        <div>
+          <h1 className="text-2xl">Register</h1>
         </div>
         <TextField
           id="outlined-basic-username"
