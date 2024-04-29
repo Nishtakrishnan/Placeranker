@@ -6,9 +6,12 @@ import MainPage from "./components/MainPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import Register from "./components/Register";
+import MapComponent from "./components/MapComponent";
+import coordinates from "./components/Coordinates"; // Import the coordinates array
+
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false); // Set to true if the user is logged in, false otherwise
+  const [loggedIn, setLoggedIn] = useState(true); // Set to true if the user is logged in, false otherwise
   return (
     <main className="font-inter min-w-[100vw] min-h-screen bg-eggshell flex items-center justify-center">
       <BrowserRouter>
