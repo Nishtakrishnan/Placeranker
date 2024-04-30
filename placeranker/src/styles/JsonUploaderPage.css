@@ -1,0 +1,10 @@
+body {
+  background-color: black;
+  color: white;
+  font-family: "Trebuchet MS, Helvetica";
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center */
+  align-items: center; /* Horizontally center */
+  height: 100vh; /* Set the body height to the viewport height */
+}
