@@ -59,22 +59,21 @@ const Login = (props) => {
   };
 
   return (
-    <div className="centered">
+    <div className="centered w-[30%]">
       <Stack
-        color="#E84A27"
+        color="#29261B"
         spacing={3.5}
         sx={{
           borderRadius: 3,
-          boxShadow: 5,
           alignItems: "center",
-          backgroundColor: "#EDE9E8",
+          backgroundColor: "#F6EFE4",
         }}
         p={7}
       >
         <div className="place">
-          <Typography variant="h2">PlaceRanker</Typography>
+          <h1 className="text-4xl">Placeranker</h1>
         </div>
-        <Typography variant="h6">Don't have an account?</Typography>
+        <h4 className="text-xl">Don't have an account?</h4>
         <Link href="/register">{"Register here."}</Link>
         <TextField
           id="outlined-basic"
