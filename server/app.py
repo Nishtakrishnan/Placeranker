@@ -13,7 +13,8 @@ app = Flask("Placeranker")
 CORS(app)
 
 # API Key for HERE API
-api_key = "WIyTOweLaqKkQrUl4HmxokjOSf-W2zhXmfUm2Sxd7zc"
+here_api_key = "Q8rZy6trVNUfRNqfcnl_2I4opvX6a69fFipEdDAkk9I"
+here_app_id = "1yxmXbPtbVLvLBgkFvSy"
 
 # Database connection parameters
 DB_HOST = '192.168.0.87'
@@ -137,14 +138,15 @@ def send_friend_request (from_user, to_user):
     return {}, 200
 
 def get_location_data (query):
-    url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={api_key}"
+    url = f"https://geocode.search.hereapi.com/v1/geocode?q={query}&apiKey={here_api_key}"
+    # url = f"https://discover.search.hereapi.com/v1/discover?at=40.11008,-88.2293&q={query}&apiKey={here_api_key}"
     response = requests.get(url)    
     data = response.json()
     return data
 
 
 @app.route("/addlocation/<username>", methods = ['POST'])
-def update_rank (username):
+def add_locations (username):
     if request.is_json:
         conn = connect_to_database()
         location_data = request.json.get("features")
@@ -173,7 +175,22 @@ def update_rank (username):
             conn.commit()
     else:
         return {}, 400
+    
+@app.route("/getlocations/<username>", methods = ['GET'])
+def get_locations(username):
+    conn = connect_to_database()
+    sql_query = f"""SELECT location_id, longitude, latitude, google_maps_url, location_name, address 
+                    FROM \"Ratings\" NATURAL JOIN \"Places\" 
+                    WHERE username = '{username}'"""
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    rows = cursor.fetchall()
+    response = {"locations" : [dict(row) for row in rows]}
+    print(response)
+    return response, 200
+
+
 
 if __name__ == "__main__":
-    # print(get_location_data("Mia Za's Champaign"))
+    # print(get_location_data("McDonalds Green, Champaign Illinois")["items"][0])
     app.run(debug = True)

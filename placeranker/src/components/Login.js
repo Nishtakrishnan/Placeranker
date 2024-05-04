@@ -31,25 +31,18 @@ const Login = (props) => {
   const onSubmit = async () => {
     // Make a get request to the database, to see if the password matches
     // REMEMBER TO PUT GET REQUEST HERE
-    const data = {
-      username: username,
-      password: password,
-    };
     try {
       const response = await fetch(`/login/${username}/${password}`, {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
       if (response.status === 200) {
         const data = await response.json();
-        if (data.successful) {
-          window.localStorage.setItem("token", username);
-          setLoggedIn(true);
-          window.location.assign("/home");
-        }
+        window.localStorage.setItem("token", username);
+        setLoggedIn(true);
+        window.location.assign("/");
       } else {
         setFailedLogin(true);
       }
