@@ -3,6 +3,7 @@ import "../styles/MainPage.css";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import UploadButton from "./UploadButton";
+import DropdownMenu from "./DropDownMenu";
 import MapComponent from "./MapComponent";
 import Login from "./Login";
 
@@ -88,8 +89,18 @@ const MainPage = (props) => {
   <MapComponent/> : 
   (
     <div className="bg-eggshell font-inter text-[#29261B] flex flex-col min-h-screen items-center justify-between py-24">
+      <div className="absolute top-4 left-4">
+        <DropdownMenu />
+      </div>
+
       <div className="md:max-w-[600px] flex flex-col gap-10">
-        <Header></Header>
+      <Header>
+  
+        </Header> {}
+      
+      
+        
+
         <div className={`w-full flex flex-col gap-6`}>
           <p>
             Welcome to placeranker! Google Maps is nice for when you know where
