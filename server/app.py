@@ -58,7 +58,41 @@ def create_user (username):
         return {}, 200
     else:
         return {}, 400
-    
+
+@app.route('/submit_review', methods=['POST'])
+def submit_review():
+    if request.is_json:
+        review_data = request.get_json()
+        location_id = review_data.get('location_id')
+        stars = review_data.get('stars')
+        review_text = review_data.get('review')
+        rating_id = review_data.get("rating_id")
+        username = 'test1234'  # Replace with the actual username
+
+        conn = connect_to_database()
+        cursor = conn.cursor()
+
+        # Check if the location exists
+        cursor.execute(
+            "SELECT * FROM \"Places\" WHERE location_id = %s",
+            (location_id,)
+        )
+        result = cursor.fetchone()
+
+        if result:
+            # Insert the review into the "Ratings" table
+            cursor.execute(
+            "UPDATE \"Ratings\" SET rating = %s, comment = %s WHERE location_id = %s AND username = %s",
+            (stars, review_text, location_id, username)
+)
+            
+            conn.commit()
+            return jsonify({'message': 'Review submitted successfully'}), 200
+        else:
+            return jsonify({'error': 'Location not found'}), 404
+
+    return jsonify({'error': 'Invalid request payload'}), 400
+  
 
 @app.route("/login/<username>/<password>", methods = ['GET'])
 def authenticate_user (username, password):
@@ -176,16 +210,32 @@ def add_locations (username):
     else:
         return {}, 400
     
-@app.route("/getlocations/<username>", methods = ['GET'])
+@app.route("/getlocations/<username>", methods=['GET'])
 def get_locations(username):
     conn = connect_to_database()
-    sql_query = f"""SELECT location_id, longitude, latitude, google_maps_url, location_name, address 
+    sql_query = f"""SELECT location_id, longitude, rating, comment, latitude, google_maps_url, location_name, address 
                     FROM \"Ratings\" NATURAL JOIN \"Places\" 
                     WHERE username = '{username}'"""
     cursor = conn.cursor()
     cursor.execute(sql_query)
     rows = cursor.fetchall()
-    response = {"locations" : [dict(row) for row in rows]}
+
+    # Restructure the response for easier unpacking
+    locations = []
+    for row in rows:
+        location = {
+            'location_id': row['location_id'],
+            'longitude': row['longitude'],
+            'rating': row['rating'],
+            'comment': row['comment'],
+            'latitude': row['latitude'],
+            'google_maps_url': row['google_maps_url'],
+            'location_name': row['location_name'],
+            'address': row['address']
+        }
+        locations.append(location)
+
+    response = {"locations": locations}
     print(response)
     return response, 200
 

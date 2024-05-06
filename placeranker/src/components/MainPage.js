@@ -3,6 +3,7 @@ import "../styles/MainPage.css";
 import Header from "./Header";
 import { useState } from "react";
 import UploadButton from "./UploadButton";
+import DropdownMenu from "./DropDownMenu";
 
 const MainPage = ({ uploadFile }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,8 +31,18 @@ const MainPage = ({ uploadFile }) => {
 
   return (
     <div className="bg-eggshell font-inter text-[#29261B] flex flex-col min-h-screen items-center justify-between py-24">
+      <div className="absolute top-4 left-4">
+        <DropdownMenu />
+      </div>
+
       <div className="md:max-w-[600px] flex flex-col gap-10">
-        <Header></Header>
+      <Header>
+  
+        </Header> {}
+      
+      
+        
+
         <div className={`w-full flex flex-col gap-6`}>
           <p>
             Welcome to placeranker! Google Maps is nice for when you know where
