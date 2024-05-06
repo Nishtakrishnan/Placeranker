@@ -197,7 +197,7 @@ def get_location_data (query):
     return data
 
 
-@app.route("/addlocation/<username>", methods = ['POST'])
+@app.route("/addlocations/<username>", methods = ['POST'])
 def add_locations (username):
     if request.is_json:
         conn = connect_to_database()

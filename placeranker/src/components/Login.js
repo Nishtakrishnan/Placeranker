@@ -7,15 +7,16 @@ import {
   Alert,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import MainPage from "./MainPage";
 
 const Login = (props) => {
-  const { setLoggedIn } = props;
+  const [loggedIn, setLoggedIn] = useState(false);
   const [failedLogin, setFailedLogin] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const status = window.localStorage.getItem("token");
+    const status = window.localStorage.getItem("login_token");
     console.log(status);
     setLoggedIn(status != null);
   }, []);
@@ -38,11 +39,11 @@ const Login = (props) => {
           "Content-Type": "application/json",
         },
       });
+      console.log(response)
       if (response.status === 200) {
         const data = await response.json();
-        window.localStorage.setItem("token", username);
+        window.localStorage.setItem("login_token", username);
         setLoggedIn(true);
-        window.location.assign("/");
       } else {
         setFailedLogin(true);
       }
@@ -51,7 +52,8 @@ const Login = (props) => {
     }
   };
 
-  return (
+  return loggedIn ? (<MainPage/>) :
+  (
     <div className="centered">
       <Stack
         color="#E84A27"
@@ -65,7 +67,7 @@ const Login = (props) => {
         p={7}
       >
         <div className="place">
-          <Typography variant="h2">PlaceRanker</Typography>
+          <Typography variant="h2">Placeranker</Typography>
         </div>
         <Typography variant="h6">Don't have an account?</Typography>
         <Link href="/register">{"Register here."}</Link>

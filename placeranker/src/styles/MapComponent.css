@@ -6,13 +6,36 @@
   width: 50%; 
   border: 2px solid black;
 }
-.marker {
-  width: 24px;
-  height: 24px;
-  background-color: #3887be;
-  border-radius: 50%;
+.marker{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width: 30px;
+  height: 30px;
+  color:#fff;
+  background: #4D2D73;
+  border:solid 2px;
+  border-radius: 0 70% 70%;
+  box-shadow:0 0 2px #000;
   cursor: pointer;
+  transform-origin:0 0;
+  transform: rotateZ(-135deg);
+  }
+  .mapboxgl-marker {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border:1px solid gray;
+    background-color:lightblue;
 }
 .marker:hover {
   background-color: #f44336;
+}
+.mapboxgl-popup {
+  max-width: 200px;
+}
+.mapboxgl-popup-content {
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
 }
