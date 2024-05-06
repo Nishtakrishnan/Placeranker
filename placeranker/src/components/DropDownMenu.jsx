@@ -21,6 +21,10 @@ const DropdownMenu = () => {
     navigate('/review');
     setIsOpen(false); // Close the dropdown menu after clicking the "Edit Profile" button
   };
+  const handleFriendsClick = () => {
+    navigate('/friends');
+    setIsOpen(false); // Close the dropdown menu after clicking the "Edit Profile" button
+  };
 
   return (
     <div className="relative">
@@ -61,6 +65,12 @@ const DropdownMenu = () => {
             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
           >
             Leave a Review
+          </button>
+          <button
+            onClick={handleFriendsClick}
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+          >
+            Friends
           </button>
         </div>
       )}

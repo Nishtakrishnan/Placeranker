@@ -10,6 +10,7 @@ import MapComponent from "./components/MapComponent";
 import coordinates from "./components/Coordinates";
 import EditProfile from "./components/EditProfile";
 import Review from "./components/Review";
+import Friends from "./components/Friends.js";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -23,6 +24,7 @@ function App() {
               <Route path="/" element={<MainPage />} />
               <Route path="/editprofile" element={<EditProfile />} />
               <Route path="/review" element={<Review />} />
+              <Route path="/friends" element={<Friends />} />
             </>
           ) : (
             <>

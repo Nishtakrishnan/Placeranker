@@ -36,28 +36,31 @@ def connect_to_database():
         print("Error connecting to Placeranker database:", e)
         return None
 
-@app.route('/create/<username>/', methods = ['POST'])
-def create_user (username):
+@app.route('/create/<username>/', methods=['POST'])
+def create_user(username):
     conn = connect_to_database()
 
-    body = None
     if request.is_json:
         body = request.json
         password = body["password"]
-        print(password)
-        conn = connect_to_database()
+
+        # Check if the username already exists in the Login table
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM \"Login\" WHERE username='{}';".format(username))
-        frame = pd.DataFrame(cursor.fetchall())
-        if (not frame.empty):
-            return {"successful" : False}, 401
-        sql_query = f"INSERT INTO \"Login\" (username, password) values {(username, password)};"
-        cursor = conn.cursor()
-        cursor.execute(sql_query)
+        cursor.execute("SELECT * FROM \"Login\" WHERE username = %s", (username,))
+        if cursor.fetchone():
+            return {"successful": False}, 401  # User already exists
+
+        # Insert the new user into the Login table
+        cursor.execute("INSERT INTO \"Login\" (username, password) VALUES (%s, %s)", (username, password))
         conn.commit()
-        return {}, 200
+
+        # Insert the new user into the Friends table
+        cursor.execute("INSERT INTO \"Friends\" (username, requests, friends_list) VALUES (%s, ARRAY[]::text[], ARRAY[]::text[])", (username,))
+        conn.commit()
+
+        return {}, 200  # User created successfully
     else:
-        return {}, 400
+        return {}, 400  # Bad request
 
 @app.route('/submit_review', methods=['POST'])
 def submit_review():
@@ -120,29 +123,28 @@ def get_friends (username):
     return {"friends" : rows}, 200
 
 # From user is the user who accepted the friend request from to_user
-@app.route("/friends/<from_user>/<to_user>", methods = ["PUT"])
-def add_friends (from_user, to_user):
+@app.route("/friends/<from_user>/<to_user>", methods=["PUT"])
+def add_friends(from_user, to_user):
     conn = connect_to_database()
-    # Get the to_user's friend requests
-    friend_requests, status = get_friend_requests(from_user)
-    friend_requests = friend_requests['requests']
-    friends_list, status = get_friends(from_user)
-    friends_list = friends_list["friends"]
-    # Can't add as friend, no pending request sent or already friends
-    if to_user not in friend_requests or to_user in friends_list:
-        return {}, 404
-    
-    # Add each other as friends
-    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{from_user}')
+
+    # Remove the requester's username from the incoming friend requests
+    sql_query = f"""UPDATE \"Friends\" SET requests = array_remove(requests, '{from_user}')
                     WHERE username = '{to_user}';"""
     cursor = conn.cursor()
     cursor.execute(sql_query)
     conn.commit()
-    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{to_user}')
-                    WHERE username = '{from_user}';"""
-    cursor = conn.cursor()
+
+    # Add each other as friends
+    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{from_user}')
+                    WHERE username = '{to_user}';"""
     cursor.execute(sql_query)
     conn.commit()
+
+    sql_query = f"""UPDATE \"Friends\" SET friends_list = array_append(friends_list, '{to_user}')
+                    WHERE username = '{from_user}';"""
+    cursor.execute(sql_query)
+    conn.commit()
+
     return {}, 200
 
 @app.route("/requests/<username>", methods = ['GET'])
@@ -152,12 +154,28 @@ def get_friend_requests (username):
     cursor = conn.cursor()
     cursor.execute(sql_query)
 
-    rows = cursor.fetchall()[0]["requests"]
-    return {"requests" : rows}, 200
+    rows = cursor.fetchall()
+    if rows:  # Check if any rows were returned
+        return {"requests": rows[0]["requests"]}, 200
+    else:
+        return {"requests": []}, 200  # Return an empty list if no rows were returned
+@app.route("/search_friends/<search_text>", methods=['GET'])
+def search_friends(search_text):
+    conn = connect_to_database()
+    # Assuming your friends' table is named "Friends" and contains a column named "username"
+    sql_query = f"""SELECT username FROM \"Login\" WHERE username ILIKE %s LIMIT 10"""
+    cursor = conn.cursor()
+    cursor.execute(sql_query, ('%' + search_text + '%',))
+    rows = cursor.fetchall()
 
+    # Extract the usernames from the database query results
+    usernames = [row['username'] for row in rows]
+
+    return jsonify({'results': usernames}), 200
 # Sendss a friend request from 'from_user' to 'to_user'
 @app.route("/requests/<from_user>/<to_user>", methods = ['PUT'])
 def send_friend_request (from_user, to_user):
+    print("hello")
     conn = connect_to_database()
     friend_requests, status = get_friend_requests(to_user)
     friend_requests = friend_requests['requests']
