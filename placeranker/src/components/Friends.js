@@ -110,15 +110,17 @@ const Friends = () => {
           Friends
         </Typography>
         <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-          Current Friends
+          Current Friends:
         </Typography>
-        {friends.map((friend) => (
-          <div key={friend}>
-            <Typography style={{ color: "black" }}>
-              {friend}
-            </Typography>
-          </div>
-        ))}
+        <Stack direction="row" spacing={3}>
+          {friends.map((friend) => (
+            <div key={friend}>
+              <Typography style={{ color: "black" }}>
+                {friend}
+              </Typography>
+            </div>
+          ))}
+        </Stack>
         <TextField
           label="Search for a friend"
           variant="outlined"
@@ -152,21 +154,23 @@ const Friends = () => {
           <Stack direction="column" spacing={2}>
             {incomingRequests.map((requester) => (
               <div key={requester}>
-                <Typography style={{ color: "black" }}>
+                <Typography variant="h6" style={{ color: "black" }}>
                   From: {requester}
                 </Typography>
-                <Button
-                  variant="contained"
-                  onClick={handleAcceptFriendRequest(requester)}
-                >
-                  Accept
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={handleRejectFriendRequest(requester)}
-                >
-                  Reject
-                </Button>
+                <Stack direction = "row" spacing={3}>
+                  <Button
+                    variant="contained"
+                    onClick={handleAcceptFriendRequest(requester)}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleRejectFriendRequest(requester)}
+                  >
+                    Reject
+                  </Button>
+                </Stack>
               </div>
             ))}
           </Stack>

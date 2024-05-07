@@ -52,20 +52,18 @@ const Login = (props) => {
 
   return loggedIn ? (<MainPage/>) :
   (
-    <div className="centered">
+    <div className="centered w-[30%]">
       <Stack
-        color="#E84A27"
-        spacing={3.5}
+        color="#29261B"
+        spacing={3}
         sx={{
-          borderRadius: 3,
-          boxShadow: 5,
           alignItems: "center",
-          backgroundColor: "#EDE9E8",
+          backgroundColor: "#F6EFE4",
         }}
-        p={7}
+        p={6}
       >
         <div className="place">
-          <Typography variant="h2">Placeranker</Typography>
+          <Typography variant="h3">Placeranker</Typography>
         </div>
         <Typography variant="h6">Don't have an account?</Typography>
         <Link href="/register">{"Register here."}</Link>
