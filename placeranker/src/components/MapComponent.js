@@ -12,6 +12,8 @@ const MapComponent = ({ markers }) => {
   const [ratingResponse, setRatingResponse] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [friends, setFriends] = useState([])
+  const [friendsLocations, setFriendsLocations] = useState([])
 
   useEffect(() => {
     const status = window.localStorage.getItem("login_token");
@@ -24,6 +26,10 @@ const MapComponent = ({ markers }) => {
         try {
           const locationData = await fetchLocationData();
           setLocations(locationData["locations"]);
+
+          const friend_response = await fetch(`/friends/${username}`)
+          const friends_data = await friend_response.json()
+          setFriends(friends_data["friends"])
         } catch (error) {
           console.error("Error fetching location data:", error);
         }
@@ -42,6 +48,36 @@ const MapComponent = ({ markers }) => {
     const data = await response.json();
     return data;
   };
+
+  useEffect(() => {
+    if (friends.length > 0) {
+      const fetchFriendsLocations = async () => {
+        try {
+          const friendsLocationsData = [];
+          for (const friend of friends) {
+            const response = await fetch(`/getlocations/${friend}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            const data = await response.json();
+            friendsLocationsData.push(...data.locations);
+          }
+          // Remove duplicate locations
+          const uniqueLocations = friendsLocationsData.filter((location, index, self) =>
+            index === self.findIndex((t) => (
+              t.latitude === location.latitude && t.longitude === location.longitude
+            ))
+          );
+          setFriendsLocations(uniqueLocations);
+        } catch (error) {
+          console.error("Error fetching friends' location data:", error);
+        }
+      };
+      fetchFriendsLocations();
+    }
+  }, [friends]);
 
   useEffect(() => {
     if (selectedLocation != null) {
@@ -67,9 +103,18 @@ const MapComponent = ({ markers }) => {
 
       let averageLatitude = 0.0;
       let averageLongitude = 0.0;
+      let minLat = locations[0].latitude
+      let minLong = locations[0].longitude
+      let maxLat = locations[0].latitude
+      let maxLong = locations[0].longitude
+
       for (const location of locations) {
         averageLatitude += location.latitude;
         averageLongitude += location.longitude;
+        minLat = Math.min(minLat, location.latitude)
+        minLong = Math.min(minLong, location.longitude)
+        maxLat = Math.max(maxLat, location.latitude)
+        maxLong = Math.max(maxLong, location.longitude)
       }
 
       averageLatitude /= locations.length;
@@ -82,6 +127,22 @@ const MapComponent = ({ markers }) => {
         zoom: 18
       });
 
+      for (const friendLocation of friendsLocations) {
+        const content = `<div>
+          <p>${friendLocation.location_name}</p>
+          <p>${friendLocation.address}</p>
+        </div>`;
+        const marker = new mapboxgl.Marker({ color: "blue" })
+          .setLngLat([friendLocation.latitude, friendLocation.longitude])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(content))
+          .addTo(map);
+      
+        marker.getElement().addEventListener('click', (e) => {
+          console.log(e)
+          setSelectedLocation(friendLocation);
+        });
+      }
+      
       for (const location of locations) {
         const content = `<div>
                     <p>${location.location_name}</p>
@@ -98,8 +159,10 @@ const MapComponent = ({ markers }) => {
           setSelectedLocation(location);
         });
       }
+      
+      map.fitBounds([[minLat, minLong], [maxLat, maxLong]], {padding : 150})
     }
-  }, [locations]);
+  }, [locations, friendsLocations]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
