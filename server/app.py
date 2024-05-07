@@ -62,15 +62,14 @@ def create_user(username):
     else:
         return {}, 400  # Bad request
 
-@app.route('/submit_review', methods=['POST'])
-def submit_review():
+@app.route('/submit_review/<username>', methods=['POST'])
+def submit_review(username):
     if request.is_json:
         review_data = request.get_json()
         location_id = review_data.get('location_id')
         stars = review_data.get('stars')
         review_text = review_data.get('review')
         rating_id = review_data.get("rating_id")
-        username = 'test1234'  # Replace with the actual username
 
         conn = connect_to_database()
         cursor = conn.cursor()
@@ -206,25 +205,27 @@ def add_locations (username):
             latitude, longitude = location_obj.get("geometry").get("coordinates")
             location_properties = location_obj.get("properties")
             google_maps_url = location_properties.get("google_maps_url")
-            address, location_name = location_properties["location"]["address"], location_properties["location"]["name"]
-            # Location_id is the hash of the address (since this will be unique anyway)
-            location_id = hashlib.sha256(address.encode()).hexdigest()
+            if ("location" in location_properties):
+                address, location_name = location_properties["location"]["address"], location_properties["location"]["name"]
+                # Location_id is the hash of the address (since this will be unique anyway)
+                location_id = hashlib.sha256(address.encode()).hexdigest()
 
-            
-            sql_query = f"""INSERT INTO \"Places\" (longitude, latitude, location_id, google_maps_url, location_name, address)
-                            values {(longitude, latitude, location_id, google_maps_url, location_name, address)}
-                            ON CONFLICT (location_id) DO NOTHING;"""
-            cursor = conn.cursor()
-            cursor.execute(sql_query)
-            conn.commit()
+                
+                sql_query = f"""INSERT INTO \"Places\" (longitude, latitude, location_id, google_maps_url, location_name, address)
+                                values {(longitude, latitude, location_id, google_maps_url, location_name, address)}
+                                ON CONFLICT (location_id) DO NOTHING;"""
+                cursor = conn.cursor()
+                cursor.execute(sql_query)
+                conn.commit()
 
-            # Also create an entry in the ratings table
-            rating_id = str(uuid.uuid4())
-            sql_query = f"""INSERT INTO \"Ratings\" (rating_id, username, location_id)
-                            values {(rating_id, username, location_id)};""" # For now, JSON doesn't contain ratings/comments so leave them blank
-            cursor = conn.cursor()
-            cursor.execute(sql_query)
-            conn.commit()
+                # Also create an entry in the ratings table
+                rating_id = str(uuid.uuid4())
+                sql_query = f"""INSERT INTO \"Ratings\" (rating_id, username, location_id)
+                                values {(rating_id, username, location_id)};""" # For now, JSON doesn't contain ratings/comments so leave them blank
+                cursor = conn.cursor()
+                cursor.execute(sql_query)
+                conn.commit()
+        return {}, 200
     else:
         return {}, 400
     
