@@ -19,6 +19,7 @@ const Review = () => {
 
   useEffect(() => {
     if (username != "") {
+      console.log(username)
       fetchLocations()
     }
   }, [username])

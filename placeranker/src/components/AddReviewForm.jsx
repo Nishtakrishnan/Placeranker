@@ -5,6 +5,13 @@ const AddReviewForm = ({ onSubmitReview, location }) => {
   const [stars, setStars] = useState(location.rating || 0);
   const [review, setReview] = useState(location.comment || "");
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [username, setUsername] = useState("")
+
+  useEffect(() => {
+    const status = window.localStorage.getItem("login_token");
+    setUsername(status)
+  }, []);
+
 
   const handleSubmit = async () => {
     const data = {
@@ -15,7 +22,7 @@ const AddReviewForm = ({ onSubmitReview, location }) => {
     };
 
     try {
-      const response = await fetch("/submit_review", {
+      const response = await fetch(`/submit_review/${username}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,6 +33,7 @@ const AddReviewForm = ({ onSubmitReview, location }) => {
       if (response.ok) {
         setSubmitSuccess(true);
         onSubmitReview();
+        window.location.reload()
       } else {
         console.error("Error submitting review:", response.statusText);
       }
