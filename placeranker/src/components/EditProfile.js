@@ -78,11 +78,10 @@ const EditProfile = () => {
         }}
         p={7}
       >
-        <div className="absolute top-4 left-4">
+      <div className="absolute top-4 left-4">
         <DropdownMenu />
       </div>
 
-        
         <div className="place">
           <Typography variant="h2">Edit Profilesss</Typography>
         </div>

@@ -9,15 +9,19 @@ const Review = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [openReviewModal, setOpenReviewModal] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-
-  const username = "test1234"; // Replace with the actual username
+  const [username, setUsername] = useState("")
 
   useEffect(() => {
-    fetchLocations();
     const status = window.localStorage.getItem("login_token");
-    console.log(status);
+    setUsername(status)
     setLoggedIn(status != null);
   }, []);
+
+  useEffect(() => {
+    if (username != "") {
+      fetchLocations()
+    }
+  }, [username])
 
   const fetchLocations = async () => {
     try {

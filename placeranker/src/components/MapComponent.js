@@ -3,6 +3,8 @@ import mapboxgl from 'mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "../styles/MapComponent.css";
+import DropdownMenu from './DropDownMenu';
+import { Typography } from '@mui/material';
 
 const MapComponent = ({ markers }) => {
   const [locations, setLocations] = useState([])
@@ -83,8 +85,8 @@ const MapComponent = ({ markers }) => {
 
   return (
     <div className="map-container">
-      <div className="text-container">
-        <h2>User's Saved Locations</h2>
+      <div className="absolute top-4 left-4">
+        <DropdownMenu />
       </div>
       <div id="map" className="map" />
     </div>
