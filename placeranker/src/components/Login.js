@@ -7,15 +7,16 @@ import {
   Alert,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import MainPage from "./MainPage";
 
 const Login = (props) => {
-  const { setLoggedIn } = props;
+  const [loggedIn, setLoggedIn] = useState(false);
   const [failedLogin, setFailedLogin] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const status = window.localStorage.getItem("token");
+    const status = window.localStorage.getItem("login_token");
     console.log(status);
     setLoggedIn(status != null);
   }, []);
@@ -29,8 +30,6 @@ const Login = (props) => {
   };
 
   const onSubmit = async () => {
-    // Make a get request to the database, to see if the password matches
-    // REMEMBER TO PUT GET REQUEST HERE
     try {
       const response = await fetch(`/login/${username}/${password}`, {
         method: "GET",
@@ -38,11 +37,11 @@ const Login = (props) => {
           "Content-Type": "application/json",
         },
       });
+      console.log(response)
       if (response.status === 200) {
         const data = await response.json();
-        window.localStorage.setItem("token", username);
+        window.localStorage.setItem("login_token", username);
         setLoggedIn(true);
-        window.location.assign("/");
       } else {
         setFailedLogin(true);
       }
@@ -51,21 +50,20 @@ const Login = (props) => {
     }
   };
 
-  return (
-    <div className="centered">
+  return loggedIn ? (<MainPage/>) :
+  (
+    <div className="centered w-[30%]">
       <Stack
-        color="#E84A27"
-        spacing={3.5}
+        color="#29261B"
+        spacing={3}
         sx={{
-          borderRadius: 3,
-          boxShadow: 5,
           alignItems: "center",
-          backgroundColor: "#EDE9E8",
+          backgroundColor: "#F6EFE4",
         }}
-        p={7}
+        p={6}
       >
         <div className="place">
-          <Typography variant="h2">PlaceRanker</Typography>
+          <Typography variant="h3">Placeranker</Typography>
         </div>
         <Typography variant="h6">Don't have an account?</Typography>
         <Link href="/register">{"Register here."}</Link>

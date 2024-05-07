@@ -18,10 +18,10 @@ const UploadButton = ({ handleUpload }) => {
         <span className="mask h-4 relative p-0 overflow-hidden">
           <div className="link-container [transition:transform_0.4s_ease]">
             <span className="link-title1 leading-4 origin-[right_center] block [transition:transform_0.2s_ease]">
-              Upload PDF
+              Upload Location JSON
             </span>
             <span className="link-title2 leading-4 block [transition:transform_0.2s_ease] rotate-[20deg] origin-[left_center]">
-              Upload PDF
+              Upload Location JSON
             </span>
           </div>
         </span>

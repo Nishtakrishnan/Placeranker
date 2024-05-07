@@ -1,37 +1,106 @@
 import React from "react";
 import "../styles/MainPage.css";
 import Header from "./Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UploadButton from "./UploadButton";
+import DropdownMenu from "./DropDownMenu";
+import MapComponent from "./MapComponent";
+import Login from "./Login";
 
-const MainPage = ({ uploadFile }) => {
-  const [selectedFile, setSelectedFile] = useState(null);
+const MainPage = (props) => {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [locationJson, setLocationJson] = useState(null);
+  const [username, setUsername] = useState("")
+  const [uploadedJson, setUploadedJson] = useState(false)
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file.type === "application/json") {
-      setSelectedFile(file);
-    } else {
-      alert("Please upload a JSON file.");
+  useEffect (() => {
+    const status = window.localStorage.getItem("login_token");
+    console.log(status);
+    setUsername(status)
+    setLoggedIn(status != null)
+  }, [])
+
+  useEffect(() => {
+    console.log("username change")
+    if (username != "") {
+      const fetchData = async () => {
+        try {
+          const location_data = await fetchLocationData();
+          console.log("Location data:", location_data)
+          if (location_data?.locations.length === 0) {
+            setUploadedJson(false);
+          } else {
+            setUploadedJson(true);
+          }
+        } catch (error) {
+          // Handle errors
+          console.error("Error fetching location data:", error);
+        }
+      }; 
+      fetchData();
     }
-  };
+  }, [username]);
 
-  async function handleUpload(file) {
-    if (selectedFile) {
-      // Here you can handle the file upload, e.g., send it to a server
-      const formData = new FormData();
-      formData.append("files", file);
-      const requestOptions = { method: "POST", body: formData };
-      const response = await fetch("/api/upload", requestOptions);
-    } else {
-      console.error("No file selected");
-    }
+  const fetchLocationData = async () => {
+    const response = await fetch(`/getlocations/${username}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json()
+    return data
   }
 
-  return (
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const contents = event.target.result;
+      const parsedData = JSON.parse(contents);
+      setLocationJson(parsedData);
+      console.log(parsedData)
+    };
+
+    reader.readAsText(file);
+  };
+
+  useEffect(() => {
+    if (locationJson != null) {
+      console.log(locationJson)
+      const uploadLocationData = async () => {
+        const response = await fetch(`/addlocations/${username}`, {
+          method : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body : JSON.stringify(locationJson),
+        })
+        if (response.status == 200) {
+          setUploadedJson(true)
+        }
+      }
+      uploadLocationData();
+    }
+  }, [locationJson])
+
+  return loggedIn ? (uploadedJson ? 
+  <MapComponent/> : 
+  (
     <div className="bg-eggshell font-inter text-[#29261B] flex flex-col min-h-screen items-center justify-between py-24">
+      <div className="absolute top-4 left-4">
+        <DropdownMenu />
+      </div>
+
       <div className="md:max-w-[600px] flex flex-col gap-10">
-        <Header></Header>
+      <Header>
+  
+        </Header> {}
+      
+      
+        
+
         <div className={`w-full flex flex-col gap-6`}>
           <p>
             Welcome to placeranker! Google Maps is nice for when you know where
@@ -39,11 +108,12 @@ const MainPage = ({ uploadFile }) => {
             places by any metric in Google Maps. Placeranker lets you do that,
             and much more.
           </p>
-          <UploadButton handleUpload={handleUpload}></UploadButton>
+          <UploadButton handleUpload={handleFileUpload}></UploadButton>
         </div>
       </div>
     </div>
-  );
+  ))
+  : (<Login/>)
 };
 
 export default MainPage;

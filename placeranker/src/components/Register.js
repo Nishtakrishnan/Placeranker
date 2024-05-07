@@ -15,7 +15,7 @@ import {
   OutlinedInput,
   Chip,
 } from "@mui/material";
-import Login from "./Login";
+import MainPage from "./MainPage"
 
 const Register = (props) => {
   const boxWidth = "75%";
@@ -31,7 +31,7 @@ const Register = (props) => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const status = window.localStorage.getItem("token");
+    const status = window.localStorage.getItem("login_token");
     setLoggedIn(status != null);
   }, []);
 
@@ -80,7 +80,7 @@ const Register = (props) => {
     // Update database
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/create/${username}/`,
+        `/create/${username}/`,
         {
           method: "POST",
           headers: {
@@ -92,12 +92,11 @@ const Register = (props) => {
       console.log(data);
       if (response.status == 200) {
         const data = await response.json();
-        if (data.successful) {
-          window.localStorage.setItem("token", username);
-          setLoggedIn(true);
-          window.location.assign("/home"); //new
-        }
-      } else {
+        window.localStorage.setItem("login_token", username);
+        setLoggedIn(true);
+        window.location.assign("/");
+      }
+      else {
         setFailedRegistration(true);
       }
     } catch (e) {
@@ -106,7 +105,7 @@ const Register = (props) => {
   };
 
   return loggedIn ? (
-    <Login />
+    <MainPage />
   ) : (
     <div className="centered w-[30%]">
       <Stack
