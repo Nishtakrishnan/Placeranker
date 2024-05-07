@@ -6,42 +6,33 @@ import Login from "./Login"
 const Friends = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResult, setSearchResult] = useState(null);
-  const [friends, setFriends] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  const username = "test1234"; // Replace with the actual username
+  const [incomingRequests, setIncomingRequests] = useState([]);
+  const [friends, setFriends] = useState([])
+  const [username, setUsername] = useState("")
+  const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
     const status = window.localStorage.getItem("login_token");
     console.log(status);
     setLoggedIn(status != null);
+    setUsername(status)
   }, []);
 
-  const handleSearchChange = (event) => {
-    setSearchText(event.target.value);
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await fetch(`/search_friends/${searchText}`);
-      const data = await response.json();
-      // Set the search result based on the API response
-      setSearchResult(data.results);
-    } catch (error) {
-      console.error("Error searching for friends:", error);
+  useEffect(() => {
+    if (username != "") {
+      fetchIncomingRequests()
+      fetchFriends()
     }
-  };
+  }, [username]);  
 
-  const handleSendFriendRequest = (friendUsername) => async () => {
+  const fetchIncomingRequests = async () => {
     try {
-      // Send a friend request to the selected friend
-      await fetch(`/requests/${username}/${friendUsername}`, {
-        method: "PUT",
-      });
-      // Display a success message
-      alert(`Friend request sent to ${friendUsername}`);
+      console.log("Figuring out username", username)
+      const response = await fetch(`/requests/${username}`);
+      const data = await response.json();
+      setIncomingRequests(data.requests);
     } catch (error) {
-      console.error("Error sending friend request:", error);
+      console.error("Error fetching incoming friend requests:", error);
     }
   };
 
@@ -56,9 +47,58 @@ const Friends = () => {
     }
   };
 
-  useEffect(() => {
-    fetchFriends();
-  }, []); // Empty dependency array ensures this effect runs only once, similar to componentDidMount
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`/search_friends/${searchText}`);
+      const data = await response.json();
+      setSearchResult(data.results);
+    } catch (error) {
+      console.error("Error searching for friends:", error);
+    }
+  };
+
+  const handleSendFriendRequest = (friendUsername) => async () => {
+    try {
+      await fetch(`/requests/${username}/${friendUsername}`, {
+        method: "PUT",
+      });
+      alert(`Friend request sent to ${friendUsername}`);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
+  };
+
+  const handleAcceptFriendRequest = (requesterUsername) => async () => {
+    try {
+      await fetch(`/friends/${requesterUsername}/${username}`, {
+        method: "PUT",
+      });
+      // Refresh incoming friend requests
+      fetchIncomingRequests();
+      alert(`Friend request from ${requesterUsername} accepted`);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+  };
+
+  const handleRejectFriendRequest = (requesterUsername) => async () => {
+    try {
+      await fetch(`/requests/${requesterUsername}/${username}`, {
+        method: "DELETE",
+      });
+      // Refresh incoming friend requests
+      fetchIncomingRequests();
+      window.location.reload();
+      alert(`Friend request from ${requesterUsername} rejected`);
+    } catch (error) {
+      console.error("Error rejecting friend request:", error);
+    }
+  };
 
   return loggedIn ? (
     <div className="centered">
@@ -100,6 +140,32 @@ const Friends = () => {
                   onClick={handleSendFriendRequest(friend)}
                 >
                   Send Friend Request
+                </Button>
+              </div>
+            ))}
+          </Stack>
+        )}
+        <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+          Incoming Friend Requests
+        </Typography>
+        {incomingRequests && (
+          <Stack direction="column" spacing={2}>
+            {incomingRequests.map((requester) => (
+              <div key={requester}>
+                <Typography style={{ color: "black" }}>
+                  From: {requester}
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={handleAcceptFriendRequest(requester)}
+                >
+                  Accept
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleRejectFriendRequest(requester)}
+                >
+                  Reject
                 </Button>
               </div>
             ))}

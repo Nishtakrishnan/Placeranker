@@ -61,6 +61,20 @@ def create_user(username):
         return {}, 200  # User created successfully
     else:
         return {}, 400  # Bad request
+    
+@app.route('/get_ratings/<location_id>/', methods=['GET'])
+def get_ratings(location_id):
+    conn = connect_to_database()
+    sql_query = f"SELECT * FROM \"Ratings\" WHERE location_id = '{location_id}' and rating IS NOT NULL;"
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    rows = cursor.fetchall()
+    print(rows)
+    if rows:  # Check if any rows were returned
+        return {"ratings": rows}, 200
+    else:
+        return {"ratings": []}, 200  # Return an empty list if no rows were returned
+    
 
 @app.route('/submit_review/<username>', methods=['POST'])
 def submit_review(username):
@@ -117,9 +131,11 @@ def get_friends (username):
     sql_query = f"SELECT friends_list FROM \"Friends\" WHERE username = '{username}';"
     cursor = conn.cursor()
     cursor.execute(sql_query)
-
-    rows = cursor.fetchall()[0]["friends_list"]
-    return {"friends" : rows}, 200
+    rows = cursor.fetchall()
+    if rows:  # Check if any rows were returned
+        return {"friends": rows[0]["friends_list"]}, 200
+    else:
+        return {"friends": []}, 200  # Return an empty list if no rows were returned
 
 # From user is the user who accepted the friend request from to_user
 @app.route("/friends/<from_user>/<to_user>", methods=["PUT"])
@@ -158,6 +174,7 @@ def get_friend_requests (username):
         return {"requests": rows[0]["requests"]}, 200
     else:
         return {"requests": []}, 200  # Return an empty list if no rows were returned
+    
 @app.route("/search_friends/<search_text>", methods=['GET'])
 def search_friends(search_text):
     conn = connect_to_database()
@@ -171,7 +188,8 @@ def search_friends(search_text):
     usernames = [row['username'] for row in rows]
 
     return jsonify({'results': usernames}), 200
-# Sendss a friend request from 'from_user' to 'to_user'
+
+# Sends a friend request from 'from_user' to 'to_user'
 @app.route("/requests/<from_user>/<to_user>", methods = ['PUT'])
 def send_friend_request (from_user, to_user):
     print("hello")
