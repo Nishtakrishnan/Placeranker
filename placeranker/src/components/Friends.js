@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Stack, Typography, TextField, Button } from "@mui/material";
 import DropdownMenu from "./DropDownMenu";
+import Login from "./Login"
 
 const Friends = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [friends, setFriends] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const username = "test1234"; // Replace with the actual username
+
+  useEffect(() => {
+    const status = window.localStorage.getItem("login_token");
+    console.log(status);
+    setLoggedIn(status != null);
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
@@ -52,7 +60,7 @@ const Friends = () => {
     fetchFriends();
   }, []); // Empty dependency array ensures this effect runs only once, similar to componentDidMount
 
-  return (
+  return loggedIn ? (
     <div className="centered">
       <div className="absolute top-4 left-4">
         <DropdownMenu />
@@ -99,7 +107,7 @@ const Friends = () => {
         )}
       </Stack>
     </div>
-  );
+  ) : <Login/>
 };
 
 export default Friends;

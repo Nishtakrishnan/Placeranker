@@ -5,6 +5,9 @@ import Login from "./components/Login";
 import MainPage from "./components/MainPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
+import EditProfile from "./components/EditProfile"
+import Review from "./components/Review"
+import Friends from "./components/Friends"
 import Register from "./components/Register";
 import MapComponent from "./components/MapComponent";
 import coordinates from "./components/Coordinates"; // Import the coordinates array

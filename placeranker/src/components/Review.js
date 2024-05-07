@@ -2,15 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Stack, Typography, Button, Modal, Box } from "@mui/material";
 import AddReviewForm from "./AddReviewForm"; // Assuming you have a separate component for adding reviews
 import DropdownMenu from "./DropDownMenu";
+import Login from "./Login"
+
 const Review = () => {
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [openReviewModal, setOpenReviewModal] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const username = "test1234"; // Replace with the actual username
 
   useEffect(() => {
     fetchLocations();
+    const status = window.localStorage.getItem("login_token");
+    console.log(status);
+    setLoggedIn(status != null);
   }, []);
 
   const fetchLocations = async () => {
@@ -34,7 +40,7 @@ const Review = () => {
     setOpenReviewModal(false);
   };
 
-  return (
+  return loggedIn ? (
     <div className="centered">
         <div className="absolute top-4 left-4">
         <DropdownMenu />
@@ -102,7 +108,7 @@ const Review = () => {
         </Box>
       </Modal>
     </div>
-  );
+  ) : <Login/>
 };
 
 export default Review;

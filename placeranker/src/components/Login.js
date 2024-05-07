@@ -30,8 +30,6 @@ const Login = (props) => {
   };
 
   const onSubmit = async () => {
-    // Make a get request to the database, to see if the password matches
-    // REMEMBER TO PUT GET REQUEST HERE
     try {
       const response = await fetch(`/login/${username}/${password}`, {
         method: "GET",

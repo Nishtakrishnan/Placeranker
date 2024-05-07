@@ -1,6 +1,7 @@
 import { Typography, Stack, TextField, Button, Alert } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DropdownMenu from "./DropDownMenu";
+import Login from "./Login"
 
 const EditProfile = () => {
   const [username, setUsername] = useState("");
@@ -9,6 +10,13 @@ const EditProfile = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [updateError, setUpdateError] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const status = window.localStorage.getItem("login_token");
+    console.log(status);
+    setLoggedIn(status != null);
+  }, []);
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -57,7 +65,7 @@ const EditProfile = () => {
     }
   };
 
-  return (
+  return loggedIn ? (
     <div className="centered">
       <Stack
         color="#E84A27"
@@ -124,7 +132,7 @@ const EditProfile = () => {
         </Button>
       </Stack>
     </div>
-  );
+  ) : <Login/>
 };
 
 export default EditProfile;

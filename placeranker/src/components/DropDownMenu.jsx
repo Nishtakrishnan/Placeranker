@@ -26,6 +26,11 @@ const DropdownMenu = () => {
     setIsOpen(false); // Close the dropdown menu after clicking the "Edit Profile" button
   };
 
+  const handleSignOut = () => {
+    window.localStorage.removeItem("login_token")
+    window.location.assign("/login");
+  }
+
   return (
     <div className="relative">
       <button
@@ -71,6 +76,12 @@ const DropdownMenu = () => {
             className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
           >
             Friends
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+          >
+            Sign Out
           </button>
         </div>
       )}
