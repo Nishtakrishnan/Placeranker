@@ -1,6 +1,6 @@
 # Placeranker
 
-Placeranker is an application designed to help you discover new locations based on recommendations from your friends and ratings.
+Placeranker is an application designed to help you discover new spots through friends' recommendations and ratings. You can view your and your friends' Google Maps saved places on a map for proximity and convenience.
 
 ## Development
 
@@ -50,7 +50,8 @@ npm start
 Now you're ready to start using Placeranker.
 
 ### Group members & Work Allocation
-#### Akshay Ghosh - In charge of working on the backend functionality for the JSON upload, querying user's locations, etc. 
-#### Georges Durand - Responsible for working on the friends functionality: querying friends, adding friends, sending a friend request, leaving reviews for locations etc.
-#### Neel Khare - Worked on the Login frontend components, connected frontend to the backend for these components, and collaborated with Nishta on the design of the application.
-#### Nishta Krishnan - Designed main page of app where users' locations are displayed and also worked on connecting all the frontend components with each other.
+#### Akshay Ghosh - In charge of developing the backend functionality for JSON upload and querying user locations. 
+#### Georges Durand - Responsible for implementing the friends functionality, including querying friends, adding friends, sending friend requests, and leaving reviews for locations.
+#### Neel Khare - Worked on the frontend components for login and connecting them to the backend.
+#### Nishta Krishnan - Designed the main page of the app, displaying users' locations, and connecting all frontend components. Additionally, worked on displaying all location data on a map.
+
